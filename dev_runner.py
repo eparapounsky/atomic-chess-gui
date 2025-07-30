@@ -52,12 +52,12 @@ class HotReloader:
     def stop_process(self):
         """Stop the GUI process."""
         if self.process:
-            print("🛑 Stopping GUI...")
+            print("Stopping GUI...")
             self.process.terminate()
             try:
                 self.process.wait(timeout=3)
             except subprocess.TimeoutExpired:
-                print("⚡ Force killing process...")
+                print("Force killing process...")
                 self.process.kill()
             self.process = None
     
@@ -79,16 +79,16 @@ class HotReloader:
                 time.sleep(0.5)  # Check every 500ms
                 
                 if self.check_for_changes():
-                    print("📝 Changes detected! Restarting...")
+                    print("Changes detected! Restarting...")
                     self.start_process()
                 
                 # Check if process is still running
                 if self.process and self.process.poll() is not None:
-                    print("❌ GUI process ended")
+                    print("GUI process ended")
                     break
                     
         except KeyboardInterrupt:
-            print("\n👋 Shutting down...")
+            print("\nShutting down...")
         finally:
             self.running = False
             self.stop_process()
@@ -103,7 +103,7 @@ def main():
     # Check if files exist
     missing_files = [f for f in watch_files if not os.path.exists(f)]
     if missing_files:
-        print(f"❌ Missing files: {', '.join(missing_files)}")
+        print(f"Missing files: {', '.join(missing_files)}")
         return
     
     reloader = HotReloader("chess_gui.py", watch_files)
