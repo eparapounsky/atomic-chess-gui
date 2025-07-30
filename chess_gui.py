@@ -96,18 +96,25 @@ class ChessGUI:
         self.board_frame.grid(row=1, column=1)
 
         # Row labels and board squares
+        left_row_frame = tk.Frame(board_frame, bg="#2b2b2b")
+        left_row_frame.grid(row=0, column=0, rowspan=2)
+
+        right_row_frame = tk.Frame(board_frame, bg="#2b2b2b")
+        right_row_frame.grid(row=0, column=9, rowspan=2)
+
         for row in range(8):
-            # Row number labels (8-1)
+            # left row labels (8-1)
             row_label = tk.Label(
-                board_frame,
+                left_row_frame,
                 text=str(8 - row),
                 font=("Arial", 12, "bold"),
                 bg="#2b2b2b",
                 fg="white",
-                width=8,
+                width=2,
             )
-            row_label.grid(row=row + 1, column=0, sticky="e", padx=(0, 5))
+            row_label.grid(row=row + 1, column=0, sticky="w", pady=(35))
 
+            # square buttons
             button_row = []
             for col in range(8):
                 # Determine square color
@@ -127,16 +134,16 @@ class ChessGUI:
 
             self.board_buttons.append(button_row)
 
-            # Right row labels
-            row_label_right = tk.Label(
-                board_frame,
+            # right row labels (8-1)
+            row_label = tk.Label(
+                right_row_frame,
                 text=str(8 - row),
                 font=("Arial", 12, "bold"),
                 bg="#2b2b2b",
                 fg="white",
                 width=2,
             )
-            row_label_right.grid(row=row + 1, column=2, sticky="w", padx=(5, 0))
+            row_label.grid(row=row + 1, column=0, sticky="w", pady=(35))
 
         # Bottom column labels
         bottom_column_frame = tk.Frame(board_frame, bg="#2b2b2b")
