@@ -88,6 +88,7 @@ class ChessGUI:
                 bg="#2b2b2b",
                 fg="white",
                 width=8,
+                height=2,
             )
             label.grid(row=0, column=i)
 
@@ -167,7 +168,7 @@ class ChessGUI:
         reset_button = tk.Button(
             button_frame,
             text="New Game",
-            font=("Arial", 12),
+            font=("Arial", 12, "bold"),
             command=self.new_game,
             bg="#4CAF50",
             fg="white",
@@ -189,13 +190,13 @@ class ChessGUI:
         quit_button = tk.Button(
             button_frame,
             text="Quit",
-            font=("Arial", 12),
+            font=("Arial", 12, "bold"),
             command=self.root.quit,
             bg="#f44336",
             fg="white",
             padx=20,
         )
-        quit_button.pack(side=tk.LEFT, padx=10)
+        quit_button.pack(side=tk.LEFT, padx=20)
 
     def square_clicked(self, row, col):
         """Handle square click events"""
@@ -311,6 +312,7 @@ class ChessGUI:
         self.update_board()
         self.update_game_info()
 
+    # Run the main event loop
     def run(self):
         """Start the GUI (enter the Tkinter event loop)"""
         self.root.mainloop()
