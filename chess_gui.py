@@ -41,21 +41,21 @@ class ChessGUI:
     def setup_ui(self):
         """Set up the main UI components: title, game info, chess board, and control buttons."""
         # Title
-        title_label = tk.Label( 
-            self.root, 
-            text="Atomic Chess", 
+        title_label = tk.Label(
+            self.root,
+            text="Atomic Chess",
             font=("Arial", 20, "bold"),
             bg="#2b2b2b",
             fg="white",
         )
-        title_label.pack(pady=10) # add title label to the window
+        title_label.pack(pady=10)  # add title to top of window
 
-        # Game info frame
-        info_frame = tk.Frame(self.root, bg="#2b2b2b")
-        info_frame.pack(pady=5)
+        # Game info bar
+        info_bar = tk.Frame(self.root, bg="#2b2b2b")
+        info_bar.pack(pady=5)
 
         self.game_state_label = tk.Label(
-            info_frame,
+            info_bar,
             text="Game State: UNFINISHED",
             font=("Arial", 12),
             bg="#2b2b2b",
@@ -64,7 +64,7 @@ class ChessGUI:
         self.game_state_label.pack(side=tk.LEFT, padx=20)
 
         self.current_player_label = tk.Label(
-            info_frame,
+            info_bar,
             text="Current Player: WHITE",
             font=("Arial", 12),
             bg="#2b2b2b",
@@ -167,6 +167,17 @@ class ChessGUI:
             padx=20,
         )
         reset_button.pack(side=tk.LEFT, padx=10)
+
+        reload_button = tk.Button(
+            button_frame,
+            text="Reload UI",
+            font=("Arial", 12),
+            command=self.reload_ui,
+            bg="#2196F3",
+            fg="white",
+            padx=20,
+        )
+        reload_button.pack(side=tk.LEFT, padx=10)
 
         quit_button = tk.Button(
             button_frame,
@@ -274,6 +285,22 @@ class ChessGUI:
         """Start a new game"""
         self.game = ChessVar()
         self.selected_square = None
+        self.update_board()
+        self.update_game_info()
+
+    # For development purposes, reload the UI
+    # This method can be called to reset the UI without restarting the application
+    def reload_ui(self):
+        """Reload the UI by destroying and recreating all widgets"""
+        # Clear all widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        
+        # Clear board buttons reference
+        self.board_buttons.clear()
+        
+        # Recreate UI
+        self.setup_ui()
         self.update_board()
         self.update_game_info()
 
