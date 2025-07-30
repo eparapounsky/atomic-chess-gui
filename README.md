@@ -1,3 +1,3 @@
 run `python chess_gui.py`
 
-<img width="500" height="1614" alt="Screenshot 2025-07-30 124304" src="https://github.com/user-attachments/assets/97e5c9e2-f01c-4196-bafa-83b157f41853" />
+<img width="500" height="1615" alt="Screenshot 2025-07-30 125200" src="https://github.com/user-attachments/assets/c1cb015d-17fc-4b02-a5ba-ac4a2168e4ed" />
