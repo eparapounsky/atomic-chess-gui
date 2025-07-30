@@ -9,7 +9,7 @@ class ChessGUI:
     def __init__(self):
         self.root = tk.Tk()  # create the main window
         self.root.title("Atomic Chess")
-        self.root.geometry("800x1200")  # set the window size
+        self.root.geometry("800x1050")  # set the window size
         self.root.configure(bg="#2b2b2b")
 
         # initialize game
@@ -175,16 +175,16 @@ class ChessGUI:
         )
         reset_button.pack(side=tk.LEFT, padx=10)
 
-        reload_button = tk.Button(
-            button_frame,
-            text="Reload UI",
-            font=("Arial", 12),
-            command=self.reload_ui,
-            bg="#2196F3",
-            fg="white",
-            padx=20,
-        )
-        reload_button.pack(side=tk.LEFT, padx=10)
+        # reload_button = tk.Button(
+        #     button_frame,
+        #     text="Reload UI",
+        #     font=("Arial", 12),
+        #     command=self.reload_ui,
+        #     bg="#2196F3",
+        #     fg="white",
+        #     padx=20,
+        # )
+        # reload_button.pack(side=tk.LEFT, padx=10)
 
         quit_button = tk.Button(
             button_frame,
