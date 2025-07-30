@@ -9,7 +9,7 @@ class ChessGUI:
     def __init__(self):
         self.root = tk.Tk()  # create the main window
         self.root.title("Atomic Chess")
-        self.root.geometry("800x600")  # set the window size
+        self.root.geometry("800x1200")  # set the window size
         self.root.configure(bg="#2b2b2b")
 
         # initialize game
@@ -44,11 +44,11 @@ class ChessGUI:
         title_label = tk.Label(
             self.root,
             text="Atomic Chess",
-            font=("Arial", 20, "bold"),
+            font=("Arial", 30, "bold"),
             bg="#2b2b2b",
             fg="white",
         )
-        title_label.pack(pady=10)  # add title to top of window
+        title_label.pack(pady=15)  # add title to top of window
 
         # Game info bar
         info_bar = tk.Frame(self.root, bg="#2b2b2b")
@@ -57,7 +57,7 @@ class ChessGUI:
         self.game_state_label = tk.Label(
             info_bar,
             text="Game State: UNFINISHED",
-            font=("Arial", 12),
+            font=("Arial", 12, "bold"),
             bg="#2b2b2b",
             fg="white",
         )
@@ -66,7 +66,7 @@ class ChessGUI:
         self.current_player_label = tk.Label(
             info_bar,
             text="Current Player: WHITE",
-            font=("Arial", 12),
+            font=("Arial", 12, "bold"),
             bg="#2b2b2b",
             fg="white",
         )
@@ -87,7 +87,7 @@ class ChessGUI:
                 font=("Arial", 12, "bold"),
                 bg="#2b2b2b",
                 fg="white",
-                width=6,
+                width=8,
             )
             label.grid(row=0, column=i)
 
@@ -104,7 +104,7 @@ class ChessGUI:
                 font=("Arial", 12, "bold"),
                 bg="#2b2b2b",
                 fg="white",
-                width=2,
+                width=8,
             )
             row_label.grid(row=row + 1, column=0, sticky="e", padx=(0, 5))
 
@@ -149,7 +149,7 @@ class ChessGUI:
                 font=("Arial", 12, "bold"),
                 bg="#2b2b2b",
                 fg="white",
-                width=6,
+                width=8,
             )
             label.grid(row=0, column=i)
 
@@ -295,17 +295,17 @@ class ChessGUI:
         # Clear all widgets
         for widget in self.root.winfo_children():
             widget.destroy()
-        
+
         # Clear board buttons reference
         self.board_buttons.clear()
-        
+
         # Recreate UI
         self.setup_ui()
         self.update_board()
         self.update_game_info()
 
     def run(self):
-        """Start the GUI"""
+        """Start the GUI (enter the Tkinter event loop)"""
         self.root.mainloop()
 
 
