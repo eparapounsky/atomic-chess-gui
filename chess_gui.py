@@ -199,23 +199,31 @@ class ChessGUI:
         quit_button.pack(side=tk.LEFT, padx=20)
 
     def square_clicked(self, row, col):
-        """Handle square click events"""
+        """
+        Handles click events on chess squares.
+        parameters:
+            row (int): The row index of the clicked square (0-7).
+            col (int): The column index of the clicked square (0-7).
+        """
+        # check if the game is finished
         if self.game.get_game_state() != "UNFINISHED":
             messagebox.showinfo(
                 "Game Over", f"Game is finished! Winner: {self.game.get_game_state()}"
             )
             return
 
+        # check if first click; select a piece
         if self.selected_square is None:
-            # First click - select a piece
             piece = self.game.get_piece_type(row, col)
+
+            # check if the square is empty
             if piece == 0:
                 messagebox.showwarning(
                     "Invalid Selection", "Please select a piece to move."
                 )
                 return
 
-            # Check if it's the current player's piece
+            # check if it's the current player's piece
             if self.game.check_if_valid_player(piece) is False:
                 messagebox.showwarning(
                     "Invalid Selection", "Please select one of your own pieces."
@@ -225,26 +233,26 @@ class ChessGUI:
             self.selected_square = (row, col)
             self.highlight_selected_square(row, col)
 
+        # check if second click; make a move
         else:
-            # Second click - make a move
             start_row, start_col = self.selected_square
 
+            # if the same square is clicked, deselect it
             if (row, col) == self.selected_square:
-                # Clicking the same square deselects it
                 self.clear_selection()
                 return
 
-            # Convert coordinates to chess notation
+            # convert coordinates to chess notation for make_move()
             start_pos = chr(ord("a") + start_col) + str(8 - start_row)
             end_pos = chr(ord("a") + col) + str(8 - row)
 
-            # Try to make the move
+            # try to make the move
             if self.game.make_move(start_pos, end_pos):
                 self.clear_selection()
                 self.update_board()
                 self.update_game_info()
 
-                # Check for game end
+                # check for game end
                 if self.game.get_game_state() != "UNFINISHED":
                     messagebox.showinfo(
                         "Game Over", f"Winner: {self.game.get_game_state()}!"
@@ -255,7 +263,7 @@ class ChessGUI:
 
     def highlight_selected_square(self, row, col):
         """Highlight the selected square"""
-        self.board_buttons[row][col].configure(bg="#ffff99")
+        self.board_buttons[row][col].configure(bg="#ffffffff")
 
     def clear_selection(self):
         """Clear the current selection and reset square colors"""
@@ -296,26 +304,26 @@ class ChessGUI:
         self.update_board()
         self.update_game_info()
 
-    # For development purposes, reload the UI
-    # This method can be called to reset the UI without restarting the application
-    def reload_ui(self):
-        """Reload the UI by destroying and recreating all widgets"""
-        # Clear all widgets
-        for widget in self.root.winfo_children():
-            widget.destroy()
-
-        # Clear board buttons reference
-        self.board_buttons.clear()
-
-        # Recreate UI
-        self.setup_ui()
-        self.update_board()
-        self.update_game_info()
-
     # Run the main event loop
     def run(self):
         """Start the GUI (enter the Tkinter event loop)"""
         self.root.mainloop()
+
+    # For development purposes, reload the UI
+    # This method can be called to reset the UI without restarting the application
+    def reload_ui(self):
+        """Reload the UI by destroying and recreating all widgets"""
+        # clear all widgets
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # clear board buttons reference
+        self.board_buttons.clear()
+
+        # recreate UI
+        self.setup_ui()
+        self.update_board()
+        self.update_game_info()
 
 
 if __name__ == "__main__":
