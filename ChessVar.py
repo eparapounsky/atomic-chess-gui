@@ -65,8 +65,11 @@ class ChessVar:
 
     def check_if_valid_player(self, piece):
         """Checks if the square being moved from does not contain the current player's piece
-        :param piece: int, represents the piece being tested
-        :return: False, if move is invalid"""
+        Parameters:
+            piece (int): represents the piece being tested
+        Returns:
+            bool: True if the piece belongs to the current player, False otherwise
+        """
 
         if self._current_player == "BLACK" and piece > 6:
             return False
@@ -75,9 +78,19 @@ class ChessVar:
 
     def check_if_valid_atomic_move(self, piece, destination_column, destination_row):
         """Checks if the move is allowed by *atomic* chess rules.
-        :param piece: int, represents the piece being moved
-        :param destination_column: int, column of potential new piece location
-        :param destination_row: int, row of potential new piece location"""
+        In atomic chess:
+        1. Kings cannot capture pieces.
+        2. When a capture occurs, an "explosion" happens that destroys the capturing piece,
+            the captured piece, and all non-pawn pieces in the surrounding 8 squares.
+        3. A player cannot make a move that would result in both kings being destroyed
+            in the explosion.
+        Parameters:
+            piece (int): represents the piece being moved
+            destination_column (int): column of potential new piece location
+            destination_row (int): row of potential new piece location
+        Returns:
+            bool: True if the move is valid according to atomic chess rules, False otherwise
+        """
 
         # king not allowed to make captures
         if piece in (BK, WK) and self._board[destination_row][destination_column] != 0:
@@ -110,11 +123,16 @@ class ChessVar:
     def check_horizontal_vertical_move(
         self, current_column, current_row, destination_column, destination_row
     ):
-        """Checks if there are any pieces in the way of a potential horizontal or vertical move.
-        :param current_column: int, column of current piece location
-        :param current_row: int, row of current piece location
-        :param destination_column: int, column of potential new piece location
-        :param destination_row: int, row of potential new piece location"""
+        """
+        Checks if there are any pieces in the way of a potential horizontal or vertical move.
+        Parameters:
+            current_column (int): The column of the current piece location (0-indexed)
+            current_row (int): The row of the current piece location (0-indexed)
+            destination_column (int): The column of the potential new piece location (0-indexed)
+            destination_row (int): The row of the potential new piece location (0-indexed)
+        Returns:
+            bool: True if the path is clear (no obstructions), False if there is at least one piece in the way
+        """
 
         if (
             current_row == destination_row and current_column < destination_column
@@ -155,11 +173,17 @@ class ChessVar:
     def check_diagonal_move(
         self, current_column, current_row, destination_column, destination_row
     ):
-        """Checks if there are any pieces in the way of a potential diagonal move.
-        :param current_column: int, column of current piece location
-        :param current_row: int, row of current piece location
-        :param destination_column: int, column of potential new piece location
-        :param destination_row: int, row of potential new piece location"""
+        """
+        Checks if there are any pieces in the way of a potential diagonal move.
+        Handles all four diagonal directions.
+        Parameters:
+            current_column (int): column of current piece location (0-7)
+            current_row (int): row of current piece location (0-7)
+            destination_column (int): column of potential new piece location (0-7)
+            destination_row (int): row of potential new piece location (0-7)
+        Returns:
+            bool: True if path is clear, False if obstructed
+        """
 
         if (
             current_row > destination_row and current_column < destination_column
@@ -208,12 +232,18 @@ class ChessVar:
     def check_if_valid_chess_move(
         self, piece, current_column, current_row, destination_column, destination_row
     ):
-        """Checks if the move is allowed by regular chess rules.
-        :param piece: int, represents the piece being moved
-        :param current_column: int, column of current piece location
-        :param current_row: int, row of current piece location
-        :param destination_column: int, column of potential new piece location
-        :param destination_row: int, row of potential new piece location"""
+        """
+        Checks if the move is allowed by regular chess rules.
+        Does not check for special moves like castling, en passant, or check/checkmate conditions.
+        Parameters:
+            piece (int): The piece being moved (uses piece constants like BP, WR, etc.)
+            current_column (int): The column (0-7) of the piece's current position
+            current_row (int): The row (0-7) of the piece's current position
+            destination_column (int): The column (0-7) of the piece's intended destination
+            destination_row (int): The row (0-7) of the piece's intended destination
+        Returns:
+            bool: True if the move is valid, False otherwise
+        """
 
         row_distance = abs(current_row - destination_row)
         column_distance = abs(current_column - destination_column)
@@ -337,11 +367,17 @@ class ChessVar:
                 return False
 
     def make_move(self, square_moved_from, square_moved_to):
-        """Checks if the given move is valid.
-        If so, moves a piece from one position to another on the board.
-        :param square_moved_from: string, the current position of a piece on the board
-        :param square_moved_to: string, the desired destination position of a piece on the board
-        :return: False-if move is invalid, True-if move is valid"""
+        """
+        Moves a piece from one square to another if the move is valid according to atomic chess rules.
+        If a capture occurs, implements the atomic explosion that eliminates all non-pawn pieces
+        in the 8 surrounding squares.
+        After the move, checks if any king has been eliminated and updates the current player.
+        Parameters:
+            square_moved_from (str): The algebraic notation of the starting square (e.g., "e2")
+            square_moved_to (str): The algebraic notation of the destination square (e.g., "e4")
+        Returns:
+            bool: True if the move was valid and executed, False otherwise
+        """
 
         current_position = list(
             square_moved_from
