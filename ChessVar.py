@@ -1,5 +1,7 @@
 from enum import Enum
 
+# Constants representing chess pieces
+# Integers used to represent pieces for easier validation and movement logic
 __ = 0  # empty space
 BR = 1  # black rook
 BH = 2  # black horse/knight
@@ -459,7 +461,7 @@ class ChessVar:
             self._current_player = "WHITE"
 
     def check_if_king_dead(self):
-        """Checks if either of the kings has been captured"""
+        """Checks if either of the kings has been captured."""
         if any(5 in row for row in self._board) is False:
             self._game_state = "WHITE_WON"
         elif any(50 in row for row in self._board) is False:
@@ -480,14 +482,26 @@ class ChessVar:
         print()
 
     def get_piece_type(self, row, column):
-        """Returns the piece at the given row and column in the chess board
-        :param row: int, row of the desired piece
-        :param column: int, column of the desired piece
-        :return: int, piece at the given location"""
+        """Returns the piece at the given row and column in the chess board.
+        Parameters:
+            row (int): row of the desired piece
+            column (int): column of the desired piece
+        Returns:
+            int: the piece type at the specified location
+        """
         return self._board[row][column]
 
 
 def validate_input(start_pos, end_pos):
+    """
+    Validates the format of chess position inputs.
+    Parameters:
+        start_pos (str): The starting position in chess notation (e.g., 'a2')
+        end_pos (str): The ending position in chess notation (e.g., 'a4')
+    Returns:
+        bool: True if both positions are valid, False otherwise.
+    """
+
     start_pos = start_pos.lower()
     end_pos = end_pos.lower()
 
@@ -509,6 +523,7 @@ def validate_input(start_pos, end_pos):
 
 
 if __name__ == "__main__":
+    """Main function to run the chess game."""
     game = ChessVar()
 
     while True:
