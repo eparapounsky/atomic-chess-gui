@@ -1,2 +1,8 @@
-# compiled Pthon bytecode files
+# compiled python bytecode files
 __pycache__/
+
+# build artifacts
+build/
+
+# distribution packages
+dist/
