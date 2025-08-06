@@ -520,25 +520,3 @@ def validate_input(start_pos, end_pos):
     if end_pos[1] not in (1, 2, 3, 4, 5, 6, 7, 8):
         print("Please specify a valid square to move to.")
         return False
-
-
-if __name__ == "__main__":
-    """Main function to run the chess game."""
-    game = ChessVar()
-
-    while True:
-        game.print_board()
-        print("Game state:", game.get_game_state())
-        print("Current player:", game.get_current_player())
-
-        user_move = input("Enter your move (as 'e2 to e4'): ")
-        start_pos, end_pos = user_move.split(" to ")
-
-        if validate_input(start_pos, end_pos) is False:
-            continue
-
-        game.make_move(start_pos, end_pos)
-
-        if game.get_game_state() != "UNFINISHED":
-            print(f"WINNER: {game.get_game_state()}")
-            break
