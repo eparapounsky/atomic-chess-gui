@@ -467,20 +467,6 @@ class ChessVar:
         elif any(50 in row for row in self._board) is False:
             self._game_state = "BLACK_WON"
 
-    def print_board(self):
-        """Prints out the chessboard with columns labeled a-h and rows labeled 1-8.
-        Piece numbers are enumerated with initial representations."""
-        print("    a  b  c  d  e  f  g  h")
-        row_label = 8
-        for row in self._board:
-            print(f"{row_label}   ", end="")
-            for piece in row:
-                print(f"{Piece(piece).name} ", end="")
-            print(f"  {row_label}")
-            row_label -= 1
-        print("    a  b  c  d  e  f  g  h")
-        print()
-
     def get_piece_type(self, row, column):
         """Returns the piece at the given row and column in the chess board.
         Parameters:
