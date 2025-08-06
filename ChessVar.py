@@ -490,33 +490,3 @@ class ChessVar:
             int: the piece type at the specified location
         """
         return self._board[row][column]
-
-
-def validate_input(start_pos, end_pos):
-    """
-    Validates the format of chess position inputs.
-    Parameters:
-        start_pos (str): The starting position in chess notation (e.g., 'a2')
-        end_pos (str): The ending position in chess notation (e.g., 'a4')
-    Returns:
-        bool: True if both positions are valid, False otherwise.
-    """
-
-    start_pos = start_pos.lower()
-    end_pos = end_pos.lower()
-
-    # check for appropriate letter
-    if start_pos[0] not in ("a", "b", "c", "d", "e", "f", "g", "h"):
-        print("Please specify a valid square to move from.")
-        return False
-    if end_pos[0] not in ("a", "b", "c", "d", "e", "f", "g", "h"):
-        print("Please specify a valid square to move to.")
-        return False
-
-    # check for appropriate number
-    if start_pos[1] not in (1, 2, 3, 4, 5, 6, 7, 8):
-        print("Please specify a valid square to move from.")
-        return False
-    if end_pos[1] not in (1, 2, 3, 4, 5, 6, 7, 8):
-        print("Please specify a valid square to move to.")
-        return False
