@@ -1,6 +1,12 @@
 # Atomic Chess Game
 A graphical interface for playing Atomic Chess, written in Python with Tkinter.
 
+## Features
+- Play Atomic Chess with a intuitive and interactive GUI
+- Rule enforcement with instant feedback
+- Displays current player and game state
+- No installation required for Windows executable
+
 ## Rules
 - Atomic chess follows standard chess rules with one major exception: captures cause explosions
 - When a piece captures another piece, both pieces are destroyed along with all pieces in the 8 adjacent squares
@@ -11,9 +17,3 @@ A graphical interface for playing Atomic Chess, written in Python with Tkinter.
 
 ## Preview
 <img width="500" height="1615" alt="Screenshot 2025-07-30 125200" src="https://github.com/user-attachments/assets/c1cb015d-17fc-4b02-a5ba-ac4a2168e4ed" />
-
-## Features
-- Play Atomic Chess with a visual, clickable chessboard
-- Highlights selected pieces and valid moves
-- Displays current player and game state
-- No installation required for Windows executable
