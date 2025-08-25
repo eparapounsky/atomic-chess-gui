@@ -47,7 +47,7 @@ class HotReloader:
         if self.process:
             self.stop_process()
 
-        print(f"🚀 Starting {self.script_path}...")
+        print(f"Starting {self.script_path}...")
         self.process = subprocess.Popen([sys.executable, self.script_path])
 
     def stop_process(self):
