@@ -1,64 +1,66 @@
+
 import tkinter as tk
-from tkinter import messagebox, font
-from ChessVar import ChessVar, Piece
+from tkinter import messagebox
+from ChessVar import ChessVar
+
+# Constants for styling
+WINDOW_SIZE = "800x1050"
+BG_COLOR = "#2b2b2b"
+LIGHT_SQUARE_COLOR = "#f0d9b5"
+DARK_SQUARE_COLOR = "#b58863"
+HIGHLIGHT_COLOR = "#ffffff"
+TITLE_FONT = ("Arial", 30, "bold")
+LABEL_FONT = ("Arial", 12, "bold")
+BUTTON_FONT = ("Arial", 12, "bold")
+PIECE_FONT = ("Arial", 16)
 
 # This module creates a window with a GUI for the game
 
 
+
 class ChessGUI:
-    def __init__(self):
-        self.root = tk.Tk()  # create the main window
+    def __init__(self) -> None:
+        """Initialize the Atomic Chess GUI window and game state."""
+        self.root = tk.Tk()
         self.root.title("Atomic Chess")
-        self.root.geometry("800x1050")  # set the window size
-        self.root.configure(bg="#2b2b2b")
+        self.root.geometry(WINDOW_SIZE)
+        self.root.configure(bg=BG_COLOR)
 
-        # initialize game
         self.game = ChessVar()
-        self.selected_square = None  # currently selected square (row, col)
-        self.board_buttons = []  # list to hold button references for the chess board
+        self.selected_square: tuple[int, int] | None = None
+        self.board_buttons: list[list[tk.Button]] = []
 
-        # use unicode symbols for pieces
-        # 1-6: black pieces, 10-60: white pieces
+        # Unicode symbols for pieces (should match ChessVar encoding)
         self.piece_symbols = {
-            0: "",  # empty
-            1: "♜",  # black rook
-            2: "♞",  # black knight
-            3: "♝",  # black bishop
-            4: "♛",  # black queen
-            5: "♚",  # black king
-            6: "♟",  # black pawn
-            10: "♖",  # white rook
-            20: "♘",  # white knight
-            30: "♗",  # white bishop
-            40: "♕",  # white queen
-            50: "♔",  # white king
-            60: "♙",  # white pawn
+            0: "",
+            1: "♜", 2: "♞", 3: "♝", 4: "♛", 5: "♚", 6: "♟",
+            10: "♖", 20: "♘", 30: "♗", 40: "♕", 50: "♔", 60: "♙",
         }
 
         self.setup_ui()
-        self.update_board()  # initialize the board display
+        self.update_board()
 
-    def setup_ui(self):
+    def setup_ui(self) -> None:
         """Set up the main UI components: title, game info, chess board, and control buttons."""
         # Title
         title_label = tk.Label(
             self.root,
             text="Atomic Chess",
-            font=("Arial", 30, "bold"),
-            bg="#2b2b2b",
+            font=TITLE_FONT,
+            bg=BG_COLOR,
             fg="white",
         )
-        title_label.pack(pady=15)  # add title to top of window
+        title_label.pack(pady=15)
 
         # Game info bar
-        info_bar = tk.Frame(self.root, bg="#2b2b2b")
+        info_bar = tk.Frame(self.root, bg=BG_COLOR)
         info_bar.pack(pady=5)
 
         self.game_state_label = tk.Label(
             info_bar,
             text="Game State: UNFINISHED",
-            font=("Arial", 12, "bold"),
-            bg="#2b2b2b",
+            font=LABEL_FONT,
+            bg=BG_COLOR,
             fg="white",
         )
         self.game_state_label.pack(side=tk.LEFT, padx=20)
@@ -66,26 +68,25 @@ class ChessGUI:
         self.current_player_label = tk.Label(
             info_bar,
             text="Current Player: WHITE",
-            font=("Arial", 12, "bold"),
-            bg="#2b2b2b",
+            font=LABEL_FONT,
+            bg=BG_COLOR,
             fg="white",
         )
         self.current_player_label.pack(side=tk.LEFT, padx=20)
 
         # Chess board frame
-        board_frame = tk.Frame(self.root, bg="#2b2b2b")
+        board_frame = tk.Frame(self.root, bg=BG_COLOR)
         board_frame.pack(pady=20)
 
         # Column labels (a-h)
-        column_frame = tk.Frame(board_frame, bg="#2b2b2b")
+        column_frame = tk.Frame(board_frame, bg=BG_COLOR)
         column_frame.grid(row=0, column=1, sticky="ew")
-
         for i, letter in enumerate("abcdefgh"):
             label = tk.Label(
                 column_frame,
                 text=letter,
-                font=("Arial", 12, "bold"),
-                bg="#2b2b2b",
+                font=LABEL_FONT,
+                bg=BG_COLOR,
                 fg="white",
                 width=8,
                 height=2,
@@ -93,14 +94,13 @@ class ChessGUI:
             label.grid(row=0, column=i)
 
         # Create the chess board grid
-        self.board_frame = tk.Frame(board_frame, bg="#2b2b2b")
+        self.board_frame = tk.Frame(board_frame, bg=BG_COLOR)
         self.board_frame.grid(row=1, column=1)
 
         # Row labels and board squares
-        left_row_frame = tk.Frame(board_frame, bg="#2b2b2b")
+        left_row_frame = tk.Frame(board_frame, bg=BG_COLOR)
         left_row_frame.grid(row=0, column=0, rowspan=2)
-
-        right_row_frame = tk.Frame(board_frame, bg="#2b2b2b")
+        right_row_frame = tk.Frame(board_frame, bg=BG_COLOR)
         right_row_frame.grid(row=0, column=9, rowspan=2)
 
         for row in range(8):
@@ -108,8 +108,8 @@ class ChessGUI:
             row_label = tk.Label(
                 left_row_frame,
                 text=str(8 - row),
-                font=("Arial", 12, "bold"),
-                bg="#2b2b2b",
+                font=LABEL_FONT,
+                bg=BG_COLOR,
                 fg="white",
                 width=2,
             )
@@ -118,57 +118,54 @@ class ChessGUI:
             # square buttons
             button_row = []
             for col in range(8):
-                # Determine square color
+                # Use lambda with default args to capture current row/col
                 is_light = (row + col) % 2 == 0
-                color = "#f0d9b5" if is_light else "#b58863"
-
+                color = LIGHT_SQUARE_COLOR if is_light else DARK_SQUARE_COLOR
                 button = tk.Button(
                     self.board_frame,
                     width=6,
                     height=3,
                     bg=color,
-                    font=("Arial", 16),
+                    font=PIECE_FONT,
                     command=lambda r=row, c=col: self.square_clicked(r, c),
                 )
                 button.grid(row=row, column=col, padx=1, pady=1)
                 button_row.append(button)
-
             self.board_buttons.append(button_row)
 
             # right row labels (8-1)
             row_label = tk.Label(
                 right_row_frame,
                 text=str(8 - row),
-                font=("Arial", 12, "bold"),
-                bg="#2b2b2b",
+                font=LABEL_FONT,
+                bg=BG_COLOR,
                 fg="white",
                 width=2,
             )
             row_label.grid(row=row + 1, column=0, sticky="w", pady=(35))
 
         # Bottom column labels
-        bottom_column_frame = tk.Frame(board_frame, bg="#2b2b2b")
+        bottom_column_frame = tk.Frame(board_frame, bg=BG_COLOR)
         bottom_column_frame.grid(row=9, column=1, sticky="ew")
-
         for i, letter in enumerate("abcdefgh"):
             label = tk.Label(
                 bottom_column_frame,
                 text=letter,
-                font=("Arial", 12, "bold"),
-                bg="#2b2b2b",
+                font=LABEL_FONT,
+                bg=BG_COLOR,
                 fg="white",
                 width=8,
             )
             label.grid(row=0, column=i)
 
         # Control buttons
-        button_frame = tk.Frame(self.root, bg="#2b2b2b")
+        button_frame = tk.Frame(self.root, bg=BG_COLOR)
         button_frame.pack(pady=20)
 
         reset_button = tk.Button(
             button_frame,
             text="New Game",
-            font=("Arial", 12, "bold"),
+            font=BUTTON_FONT,
             command=self.new_game,
             bg="#4CAF50",
             fg="white",
@@ -176,21 +173,10 @@ class ChessGUI:
         )
         reset_button.pack(side=tk.LEFT, padx=10)
 
-        # reload_button = tk.Button(
-        #     button_frame,
-        #     text="Reload UI",
-        #     font=("Arial", 12),
-        #     command=self.reload_ui,
-        #     bg="#2196F3",
-        #     fg="white",
-        #     padx=20,
-        # )
-        # reload_button.pack(side=tk.LEFT, padx=10)
-
         quit_button = tk.Button(
             button_frame,
             text="Quit",
-            font=("Arial", 12, "bold"),
+            font=BUTTON_FONT,
             command=self.root.quit,
             bg="#f44336",
             fg="white",
@@ -198,61 +184,40 @@ class ChessGUI:
         )
         quit_button.pack(side=tk.LEFT, padx=20)
 
-    def square_clicked(self, row, col):
-        """
-        Handles click events on chess squares.
-        parameters:
-            row (int): The row index of the clicked square (0-7).
-            col (int): The column index of the clicked square (0-7).
-        """
-        # check if the game is finished
+    def square_clicked(self, row: int, col: int) -> None:
+        """Handle click events on chess squares."""
         if self.game.get_game_state() != "UNFINISHED":
             messagebox.showinfo(
                 "Game Over", f"Game is finished! Winner: {self.game.get_game_state()}"
             )
             return
 
-        # check if first click; select a piece
         if self.selected_square is None:
             piece = self.game.get_piece_type(row, col)
-
-            # check if the square is empty
             if piece == 0:
                 messagebox.showwarning(
                     "Invalid Selection", "Please select a piece to move."
                 )
                 return
-
-            # check if it's the current player's piece
-            if self.game.check_if_valid_player(piece) is False:
+            if not self.game.check_if_valid_player(piece):
                 messagebox.showwarning(
                     "Invalid Selection", "Please select one of your own pieces."
                 )
                 return
-
             self.selected_square = (row, col)
             self.highlight_selected_square(row, col)
-
-        # check if second click; make a move
         else:
             start_row, start_col = self.selected_square
-
-            # if the same square is clicked, deselect it
             if (row, col) == self.selected_square:
                 self.clear_selection()
                 return
-
-            # convert coordinates to chess notation for make_move()
+            # Convert coordinates to chess notation
             start_pos = chr(ord("a") + start_col) + str(8 - start_row)
             end_pos = chr(ord("a") + col) + str(8 - row)
-
-            # try to make the move
             if self.game.make_move(start_pos, end_pos):
                 self.clear_selection()
                 self.update_board()
                 self.update_game_info()
-
-                # check for game end
                 if self.game.get_game_state() != "UNFINISHED":
                     messagebox.showinfo(
                         "Game Over", f"Winner: {self.game.get_game_state()}!"
@@ -261,35 +226,34 @@ class ChessGUI:
                 messagebox.showwarning("Invalid Move", "That move is not allowed.")
                 self.clear_selection()
 
-    def highlight_selected_square(self, row, col):
-        """Highlight the selected square"""
-        self.board_buttons[row][col].configure(bg="#ffffff")
+    def highlight_selected_square(self, row: int, col: int) -> None:
+        """Highlight the selected square."""
+        self.board_buttons[row][col].configure(bg=HIGHLIGHT_COLOR)
 
-    def clear_selection(self):
-        """Clear the current selection and reset square colors"""
+    def clear_selection(self) -> None:
+        """Clear the current selection and reset square colors."""
         self.selected_square = None
         self.update_board_colors()
 
-    def update_board_colors(self):
-        """Update the colors of all board squares"""
+    def update_board_colors(self) -> None:
+        """Update the colors of all board squares."""
         for row in range(8):
             for col in range(8):
                 is_light = (row + col) % 2 == 0
-                color = "#f0d9b5" if is_light else "#b58863"
+                color = LIGHT_SQUARE_COLOR if is_light else DARK_SQUARE_COLOR
                 self.board_buttons[row][col].configure(bg=color)
 
-    def update_board(self):
-        """Update the visual representation of the board"""
+    def update_board(self) -> None:
+        """Update the visual representation of the board."""
         for row in range(8):
             for col in range(8):
                 piece = self.game.get_piece_type(row, col)
                 symbol = self.piece_symbols.get(piece, "")
                 self.board_buttons[row][col].configure(text=symbol)
-
         self.update_board_colors()
 
-    def update_game_info(self):
-        """Update the game state and current player labels"""
+    def update_game_info(self) -> None:
+        """Update the game state and current player labels."""
         self.game_state_label.configure(
             text=f"Game State: {self.game.get_game_state()}"
         )
@@ -297,33 +261,28 @@ class ChessGUI:
             text=f"Current Player: {self.game.get_current_player()}"
         )
 
-    def new_game(self):
-        """Start a new game"""
+    def new_game(self) -> None:
+        """Start a new game."""
         self.game = ChessVar()
         self.selected_square = None
         self.update_board()
         self.update_game_info()
 
-    # Run the main event loop
-    def run(self):
-        """Start the GUI (enter the Tkinter event loop)"""
+
+    def run(self) -> None:
+        """Start the GUI (enter the Tkinter event loop)."""
         self.root.mainloop()
 
-    # For development purposes, reload the UI
-    # This method can be called to reset the UI without restarting the application
-    def reload_ui(self):
-        """Reload the UI by destroying and recreating all widgets"""
-        # clear all widgets
+    # For development: reload the UI without restarting the app
+    def reload_ui(self) -> None:
+        """Reload the UI by destroying and recreating all widgets."""
         for widget in self.root.winfo_children():
             widget.destroy()
-
-        # clear board buttons reference
         self.board_buttons.clear()
-
-        # recreate UI
         self.setup_ui()
         self.update_board()
         self.update_game_info()
+
 
 
 if __name__ == "__main__":
