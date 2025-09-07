@@ -36,15 +36,29 @@ class Piece(Enum):
 
 
 class ChessVar:
-    """Represents a game of atomic chess"""
+    """
+    Represents a game of atomic chess.
+    
+    Atomic chess is a variant of chess where:
+    1. Kings cannot capture pieces
+    2. When a capture occurs, an "explosion" destroys the capturing piece,
+       captured piece, and all non-pawn pieces in surrounding 8 squares
+    3. Players cannot make moves that would destroy both kings
+    4. Game ends when one king is destroyed
+    
+    Attributes:
+        _board: 8x8 list representing the chess board with piece values
+        _game_state: Current state ("UNFINISHED", "WHITE_WON", "BLACK_WON")
+        _current_player: Current player ("WHITE" or "BLACK")
+    """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Creates an instance of a game of atomic chess.
         Creates a starting board.
         Initializes game state to unfinished.
         Initializes first player to white."""
 
-        self._board = [
+        self._board: List[List[int]] = [
             [1, 2, 3, 4, 5, 3, 2, 1],
             [6, 6, 6, 6, 6, 6, 6, 6],
             [0, 0, 0, 0, 0, 0, 0, 0],
@@ -54,18 +68,18 @@ class ChessVar:
             [60, 60, 60, 60, 60, 60, 60, 60],
             [10, 20, 30, 40, 50, 30, 20, 10],
         ]
-        self._game_state = "UNFINISHED"
-        self._current_player = "WHITE"
+        self._game_state: str = "UNFINISHED"
+        self._current_player: str = "WHITE"
 
-    def get_game_state(self):
+    def get_game_state(self) -> str:
         """Returns the state of the game: UNFINISHED, WHITE_WON, or BLACK_WON"""
         return self._game_state
 
-    def get_current_player(self):
+    def get_current_player(self) -> str:
         """Returns the current player: WHITE or BLACK"""
         return self._current_player
 
-    def check_if_valid_player(self, piece):
+    def check_if_valid_player(self, piece: int) -> bool:
         """Checks if the square being moved from does not contain the current player's piece
         Parameters:
             piece (int): represents the piece being tested
@@ -77,15 +91,10 @@ class ChessVar:
             return False
         if self._current_player == "WHITE" and piece < 10:
             return False
+        return True
 
-    def check_if_valid_atomic_move(self, piece, destination_column, destination_row):
+    def check_if_valid_atomic_move(self, piece: int, destination_column: int, destination_row: int) -> bool:
         """Checks if the move is allowed by *atomic* chess rules.
-        In atomic chess:
-        1. Kings cannot capture pieces.
-        2. When a capture occurs, an "explosion" happens that destroys the capturing piece,
-            the captured piece, and all non-pawn pieces in the surrounding 8 squares.
-        3. A player cannot make a move that would result in both kings being destroyed
-            in the explosion.
         Parameters:
             piece (int): represents the piece being moved
             destination_column (int): column of potential new piece location
@@ -121,10 +130,12 @@ class ChessVar:
                     continue
             if 5 in pieces_list and 50 in pieces_list:
                 return False
+        
+        return True
 
     def check_horizontal_vertical_move(
-        self, current_column, current_row, destination_column, destination_row
-    ):
+        self, current_column: int, current_row: int, destination_column: int, destination_row: int
+    ) -> bool:
         """
         Checks if there are any pieces in the way of a potential horizontal or vertical move.
         Parameters:
@@ -171,10 +182,12 @@ class ChessVar:
                 if self._board[checked_row][current_column] != 0:
                     return False
                 checked_row += 1
+        
+        return True
 
     def check_diagonal_move(
-        self, current_column, current_row, destination_column, destination_row
-    ):
+        self, current_column: int, current_row: int, destination_column: int, destination_row: int
+    ) -> bool:
         """
         Checks if there are any pieces in the way of a potential diagonal move.
         Handles all four diagonal directions.
@@ -230,10 +243,12 @@ class ChessVar:
                     return False
                 checked_row += 1
                 checked_column -= 1
+        
+        return True
 
     def check_if_valid_chess_move(
-        self, piece, current_column, current_row, destination_column, destination_row
-    ):
+        self, piece: int, current_column: int, current_row: int, destination_column: int, destination_row: int
+    ) -> bool:
         """
         Checks if the move is allowed by regular chess rules.
         Does not check for special moves like castling, en passant, or check/checkmate conditions.
@@ -251,7 +266,8 @@ class ChessVar:
         column_distance = abs(current_column - destination_column)
 
         # player cannot move off board
-        if destination_column > 7 or destination_row < 0:
+        if (destination_column < 0 or destination_column > 7 or 
+            destination_row < 0 or destination_row > 7):
             return False
 
         # player cannot capture their own piece
@@ -367,8 +383,10 @@ class ChessVar:
         ):
             if row_distance > 1:
                 return False
+        
+        return True
 
-    def make_move(self, square_moved_from, square_moved_to):
+    def make_move(self, square_moved_from: str, square_moved_to: str) -> bool:
         """
         Moves a piece from one square to another if the move is valid according to atomic chess rules.
         If a capture occurs, implements the atomic explosion that eliminates all non-pawn pieces
@@ -381,20 +399,35 @@ class ChessVar:
             bool: True if the move was valid and executed, False otherwise
         """
 
-        current_position = list(
-            square_moved_from
-        )  # splits string into a list of characters
+        # Input validation
+        if (not isinstance(square_moved_from, str) or not isinstance(square_moved_to, str) or
+            len(square_moved_from) != 2 or len(square_moved_to) != 2):
+            return False
+
+        current_position = list(square_moved_from)
         destination_position = list(square_moved_to)
 
-        current_column = ord(current_position[0]) - ord(
-            "a"
-        )  # unicode conversion, a = 0
-        current_row = 8 - int(current_position[1])  # reverse order of rows
+        # Validate algebraic notation format
+        if (not current_position[0].isalpha() or not current_position[1].isdigit() or
+            not destination_position[0].isalpha() or not destination_position[1].isdigit()):
+            return False
 
-        piece = self.get_piece_type(current_row, current_column)
+        current_column = ord(current_position[0]) - ord("a")
+        current_row = 8 - int(current_position[1])
 
         destination_column = ord(destination_position[0]) - ord("a")
         destination_row = 8 - int(destination_position[1])
+
+        # Validate coordinates are within board bounds
+        if (current_column < 0 or current_column > 7 or current_row < 0 or current_row > 7 or
+            destination_column < 0 or destination_column > 7 or destination_row < 0 or destination_row > 7):
+            return False
+
+        piece = self.get_piece_type(current_row, current_column)
+
+        # Check if there's actually a piece to move
+        if piece == 0:
+            return False
 
         if self.check_if_valid_player(piece) is False:
             return False
@@ -453,21 +486,21 @@ class ChessVar:
 
         return True
 
-    def update_current_player(self):
+    def update_current_player(self) -> None:
         """Updates the current player by alternating between black and white."""
         if self._current_player == "WHITE":
             self._current_player = "BLACK"
         else:
             self._current_player = "WHITE"
 
-    def check_if_king_dead(self):
+    def check_if_king_dead(self) -> None:
         """Checks if either of the kings has been captured."""
         if any(5 in row for row in self._board) is False:
             self._game_state = "WHITE_WON"
         elif any(50 in row for row in self._board) is False:
             self._game_state = "BLACK_WON"
 
-    def get_piece_type(self, row, column):
+    def get_piece_type(self, row: int, column: int) -> int:
         """Returns the piece at the given row and column in the chess board.
         Parameters:
             row (int): row of the desired piece
