@@ -399,33 +399,29 @@ class ChessVar:
             bool: True if the move was valid and executed, False otherwise
         """
 
-        # Input validation
-        if (not isinstance(square_moved_from, str) or not isinstance(square_moved_to, str) or
-            len(square_moved_from) != 2 or len(square_moved_to) != 2):
-            return False
-
-        current_position = list(square_moved_from)
+        current_position = list(
+            square_moved_from
+        )  # splits string into a list of characters
         destination_position = list(square_moved_to)
 
-        # Validate algebraic notation format
-        if (not current_position[0].isalpha() or not current_position[1].isdigit() or
-            not destination_position[0].isalpha() or not destination_position[1].isdigit()):
-            return False
+        current_column = ord(current_position[0]) - ord(
+            "a"
+        )  # unicode conversion, a = 0
+        current_row = 8 - int(current_position[1])  # reverse order of rows
 
-        current_column = ord(current_position[0]) - ord("a")
-        current_row = 8 - int(current_position[1])
+        piece = self.get_piece_type(current_row, current_column)
 
         destination_column = ord(destination_position[0]) - ord("a")
         destination_row = 8 - int(destination_position[1])
 
-        # Validate coordinates are within board bounds
+        # validate coordinates are within board bounds
         if (current_column < 0 or current_column > 7 or current_row < 0 or current_row > 7 or
             destination_column < 0 or destination_column > 7 or destination_row < 0 or destination_row > 7):
             return False
 
         piece = self.get_piece_type(current_row, current_column)
 
-        # Check if there's actually a piece to move
+        # check if there's actually a piece to move
         if piece == 0:
             return False
 
