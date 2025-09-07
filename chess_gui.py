@@ -263,7 +263,7 @@ class ChessGUI:
 
     def highlight_selected_square(self, row, col):
         """Highlight the selected square"""
-        self.board_buttons[row][col].configure(bg="#ffffffff")
+        self.board_buttons[row][col].configure(bg="#ffffff")
 
     def clear_selection(self):
         """Clear the current selection and reset square colors"""

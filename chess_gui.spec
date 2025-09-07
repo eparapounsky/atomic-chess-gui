@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['chess_gui.py', 'ChessVar.py'],
+    ['chess_gui.py'],
     pathex=[],
     binaries=[],
     datas=[],
