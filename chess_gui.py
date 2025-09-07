@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import messagebox
 from ChessVar import ChessVar
@@ -14,10 +13,8 @@ LABEL_FONT = ("Arial", 12, "bold")
 BUTTON_FONT = ("Arial", 12, "bold")
 PIECE_FONT = ("Arial", 16)
 
+
 # This module creates a window with a GUI for the game
-
-
-
 class ChessGUI:
     def __init__(self) -> None:
         """Initialize the Atomic Chess GUI window and game state."""
@@ -30,11 +27,22 @@ class ChessGUI:
         self.selected_square: tuple[int, int] | None = None
         self.board_buttons: list[list[tk.Button]] = []
 
-        # Unicode symbols for pieces (should match ChessVar encoding)
+        # use unicode symbols for pieces
+        # 1-6: black pieces, 10-60: white pieces
         self.piece_symbols = {
             0: "",
-            1: "♜", 2: "♞", 3: "♝", 4: "♛", 5: "♚", 6: "♟",
-            10: "♖", 20: "♘", 30: "♗", 40: "♕", 50: "♔", 60: "♙",
+            1: "♜",
+            2: "♞",
+            3: "♝",
+            4: "♛",
+            5: "♚",
+            6: "♟",
+            10: "♖",
+            20: "♘",
+            30: "♗",
+            40: "♕",
+            50: "♔",
+            60: "♙",
         }
 
         self.setup_ui()
@@ -268,7 +276,6 @@ class ChessGUI:
         self.update_board()
         self.update_game_info()
 
-
     def run(self) -> None:
         """Start the GUI (enter the Tkinter event loop)."""
         self.root.mainloop()
@@ -282,7 +289,6 @@ class ChessGUI:
         self.setup_ui()
         self.update_board()
         self.update_game_info()
-
 
 
 if __name__ == "__main__":
