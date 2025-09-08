@@ -8,7 +8,7 @@ Download the game [here](https://github.com/eparapounsky/atomic-chess-gui/releas
 - Play Atomic Chess with an intuitive and interactive GUI
 - Rule enforcement with instant feedback
 - Displays current player and game state
-- No installation required for Windows executable
+- No installation required for executable
 
 ## Rules
 - Atomic chess follows standard chess rules with one major exception: captures cause explosions
