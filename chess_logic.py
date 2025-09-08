@@ -332,134 +332,144 @@ class AtomicChessGame:
         Returns:
             bool: True if the move is valid, False otherwise
         """
+        if not self._is_destination_valid(piece, destination_column, destination_row):
+            return False
 
-        row_distance = abs(current_row - destination_row)
-        column_distance = abs(current_column - destination_column)
+        # check piece-specific movement rules
+        if piece in (BR, WR):
+            return self._is_valid_rook_move(current_column, current_row, destination_column, destination_row)
+        elif piece in (BH, WH):
+            return self._is_valid_knight_move(current_column, current_row, destination_column, destination_row)
+        elif piece in (BB, WB):
+            return self._is_valid_bishop_move(current_column, current_row, destination_column, destination_row)
+        elif piece in (BQ, WQ):
+            return self._is_valid_queen_move(current_column, current_row, destination_column, destination_row)
+        elif piece in (BK, WK):
+            return self._is_valid_king_move(current_column, current_row, destination_column, destination_row)
+        elif piece in (BP, WP):
+            return self._is_valid_pawn_move(piece, current_column, current_row, destination_column, destination_row)
 
+        return False
+
+    def _is_destination_valid(self, piece: int, destination_column: int, destination_row: int) -> bool:
+        """Check if destination is on board and not occupied by own piece."""
         # player cannot move off board
-        if (
-            destination_column < 0
-            or destination_column > 7
-            or destination_row < 0
-            or destination_row > 7
-        ):
+        if destination_column < 0 or destination_column > 7 or destination_row < 0 or destination_row > 7:
             return False
 
         # player cannot capture their own piece
-        if (
-            piece < 10 and 0 < self._board[destination_row][destination_column] < 10
-        ):  # black
+        target_piece = self._board[destination_row][destination_column]
+        if piece < 10 and 0 < target_piece < 10:  # black piece capturing black
             return False
-        if (
-            piece >= 10 and self._board[destination_row][destination_column] >= 10
-        ):  # white
+        if piece >= 10 and target_piece >= 10:  # white piece capturing white
             return False
-
-        # rook can only move straight, no limit on spaces
-        if (
-            piece in (BR, WR)
-            and current_row != destination_row
-            and current_column != destination_column
-        ):
-            return False
-        # check for pieces in rook's way
-        if piece in (BR, WR):
-            if (
-                self.check_horizontal_vertical_move(
-                    current_column, current_row, destination_column, destination_row
-                )
-                is False
-            ):
-                return False
-
-        # horse can only move in L shape, can jump over pieces
-        if piece in (BH, WH) and (row_distance, column_distance) not in [
-            (1, 2),
-            (2, 1),
-        ]:
-            return False
-
-        # bishop can only move diagonally, no limit on spaces
-        if piece in (BB, WB) and row_distance != column_distance:
-            return False
-        # check for blocking pieces for bishop
-        if piece in (BB, WB):
-            if (
-                self.check_diagonal_move(
-                    current_column, current_row, destination_column, destination_row
-                )
-                is False
-            ):
-                return False
-
-        # queen can move in any direction, no limit on spaces
-        if piece in (BQ, WQ):
-            if not (
-                row_distance == column_distance
-                or current_row == destination_row
-                or current_column == destination_column
-            ):
-                return False
-
-            # check horizontal/vertical moves for blocking pieces
-            if current_row == destination_row or current_column == destination_column:
-                if (
-                    self.check_horizontal_vertical_move(
-                        current_column, current_row, destination_column, destination_row
-                    )
-                    is False
-                ):
-                    return False
-
-            # check diagonal moves for blocking pieces
-            if row_distance == column_distance:
-                if (
-                    self.check_diagonal_move(
-                        current_column, current_row, destination_column, destination_row
-                    )
-                    is False
-                ):
-                    return False
-
-        # king can only move 1 space at a time, any direction
-        if piece in (BK, WK) and (row_distance > 1 or column_distance > 1):
-            return False
-
-        # pawns cannot move backwards or sideways
-        if piece == BP and current_row >= destination_row:
-            return False
-        if piece == WP and current_row <= destination_row:
-            return False
-
-        # pawns can only move diagonally if making a capture
-        if (
-            piece in (BP, WP)
-            and self._board[destination_row][destination_column] == 0
-            and current_column != destination_column
-        ):
-            return False
-
-        # pawns cannot make head-on captures (only diagonal)
-        if (
-            piece in (BP, WP)
-            and self._board[destination_row][destination_column] != 0
-            and current_column == destination_column
-        ):
-            return False
-
-        # pawns can move forward 2 spaces on first turn, 1 thereafter
-        if piece in (BP, WP) and (piece in self._board[1] or piece in self._board[6]):
-            if row_distance > 2:
-                return False
-        elif (
-            piece in (BP, WP)
-            and piece not in self._board[1]
-            and piece not in self._board[6]
-        ):
-            if row_distance > 1:
-                return False
 
         return True
+
+    def _is_valid_rook_move(self, current_column: int, current_row: int, 
+                           destination_column: int, destination_row: int) -> bool:
+        """Check if rook move is valid."""
+        # rook can only move straight (horizontal or vertical)
+        if current_row != destination_row and current_column != destination_column:
+            return False
+
+        # check for pieces blocking the path
+        return self.check_horizontal_vertical_move(
+            current_column, current_row, destination_column, destination_row
+        )
+
+    def _is_valid_knight_move(self, current_column: int, current_row: int,
+                             destination_column: int, destination_row: int) -> bool:
+        """Check if knight move is valid."""
+        row_distance = abs(current_row - destination_row)
+        column_distance = abs(current_column - destination_column)
+        
+        # knight moves in L shape: 2+1 or 1+2
+        return (row_distance, column_distance) in [(1, 2), (2, 1)]
+
+    def _is_valid_bishop_move(self, current_column: int, current_row: int,
+                             destination_column: int, destination_row: int) -> bool:
+        """Check if bishop move is valid."""
+        row_distance = abs(current_row - destination_row)
+        column_distance = abs(current_column - destination_column)
+        
+        # bishop can only move diagonally
+        if row_distance != column_distance:
+            return False
+
+        # check for pieces blocking the diagonal path
+        return self.check_diagonal_move(
+            current_column, current_row, destination_column, destination_row
+        )
+
+    def _is_valid_queen_move(self, current_column: int, current_row: int,
+                            destination_column: int, destination_row: int) -> bool:
+        """Check if queen move is valid."""
+        row_distance = abs(current_row - destination_row)
+        column_distance = abs(current_column - destination_column)
+        
+        # queen can move any amount of spaces in any direction
+        is_straight = current_row == destination_row or current_column == destination_column
+        is_diagonal = row_distance == column_distance
+        
+        if not (is_straight or is_diagonal):
+            return False
+
+        # check for blocking pieces based on movement type
+        if is_straight:
+            return self.check_horizontal_vertical_move(
+                current_column, current_row, destination_column, destination_row
+            )
+        else:  # is_diagonal
+            return self.check_diagonal_move(
+                current_column, current_row, destination_column, destination_row
+            )
+
+    def _is_valid_king_move(self, current_column: int, current_row: int,
+                           destination_column: int, destination_row: int) -> bool:
+        """Check if king move is valid."""
+        row_distance = abs(current_row - destination_row)
+        column_distance = abs(current_column - destination_column)
+        
+        # king can only move 1 space in any direction
+        return row_distance <= 1 and column_distance <= 1
+
+    def _is_valid_pawn_move(self, piece: int, current_column: int, current_row: int,
+                           destination_column: int, destination_row: int) -> bool:
+        """Check if pawn move is valid."""
+        row_distance = abs(current_row - destination_row)
+        column_distance = abs(current_column - destination_column)
+        target_piece = self._board[destination_row][destination_column]
+        
+        # pawns cannot move backwards
+        if piece == BP and current_row >= destination_row:  # black pawn moving up
+            return False
+        if piece == WP and current_row <= destination_row:  # white pawn moving down
+            return False
+
+        # diagonal moves (captures)
+        if column_distance == 1:
+            # can only move diagonally if capturing
+            if target_piece == 0:
+                return False
+            # must move exactly 1 row forward
+            return row_distance == 1
+
+        # straight moves (non-captures)
+        if current_column == destination_column:
+            # cannot capture pieces directly ahead
+            if target_piece != 0:
+                return False
+            
+            # check if pawn is on starting row (can move 2 spaces)
+            is_on_starting_row = (piece == BP and current_row == 1) or (piece == WP and current_row == 6)
+            
+            if is_on_starting_row:
+                return row_distance in [1, 2]
+            else:
+                return row_distance == 1
+
+        return False
 
     def parse_square_notation(self, square: str) -> tuple[int, int]:
         """
