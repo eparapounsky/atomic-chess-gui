@@ -2,7 +2,7 @@
 A graphical interface for playing Atomic Chess, written in Python with Tkinter.
 
 ## Download Available
-Download the game [here](https://github.com/eparapounsky/atomic-chess-gui/releases) (Windows only)
+Download the game [here](https://github.com/eparapounsky/atomic-chess-gui/releases) (Windows and Mac only)
 
 ## Features
 - Play Atomic Chess with an intuitive and interactive GUI
