@@ -38,14 +38,14 @@ class Piece(Enum):
 class AtomicChessGame:
     """
     Represents a game of atomic chess.
-    
+
     Atomic chess is a variant of chess where:
     1. Kings cannot capture pieces
     2. When a capture occurs, an "explosion" destroys the capturing piece,
        captured piece, and all non-pawn pieces in surrounding 8 squares
     3. Players cannot make moves that would destroy both kings
     4. Game ends when one king is destroyed
-    
+
     Attributes:
         _board: 8x8 list representing the chess board with piece values
         _game_state: Current state ("UNFINISHED", "WHITE_WON", "BLACK_WON")
@@ -93,7 +93,9 @@ class AtomicChessGame:
             return False
         return True
 
-    def check_if_valid_atomic_move(self, piece: int, destination_column: int, destination_row: int) -> bool:
+    def check_if_valid_atomic_move(
+        self, piece: int, destination_column: int, destination_row: int
+    ) -> bool:
         """Checks if the move is allowed by *atomic* chess rules.
         Parameters:
             piece (int): represents the piece being moved
@@ -130,11 +132,15 @@ class AtomicChessGame:
                     continue
             if 5 in pieces_list and 50 in pieces_list:
                 return False
-        
+
         return True
 
     def check_horizontal_vertical_move(
-        self, current_column: int, current_row: int, destination_column: int, destination_row: int
+        self,
+        current_column: int,
+        current_row: int,
+        destination_column: int,
+        destination_row: int,
     ) -> bool:
         """
         Checks if there are any pieces in the way of a potential horizontal or vertical move.
@@ -182,11 +188,15 @@ class AtomicChessGame:
                 if self._board[checked_row][current_column] != 0:
                     return False
                 checked_row += 1
-        
+
         return True
 
     def check_diagonal_move(
-        self, current_column: int, current_row: int, destination_column: int, destination_row: int
+        self,
+        current_column: int,
+        current_row: int,
+        destination_column: int,
+        destination_row: int,
     ) -> bool:
         """
         Checks if there are any pieces in the way of a potential diagonal move.
@@ -243,11 +253,16 @@ class AtomicChessGame:
                     return False
                 checked_row += 1
                 checked_column -= 1
-        
+
         return True
 
     def check_if_valid_chess_move(
-        self, piece: int, current_column: int, current_row: int, destination_column: int, destination_row: int
+        self,
+        piece: int,
+        current_column: int,
+        current_row: int,
+        destination_column: int,
+        destination_row: int,
     ) -> bool:
         """
         Checks if the move is allowed by regular chess rules.
@@ -266,8 +281,12 @@ class AtomicChessGame:
         column_distance = abs(current_column - destination_column)
 
         # player cannot move off board
-        if (destination_column < 0 or destination_column > 7 or 
-            destination_row < 0 or destination_row > 7):
+        if (
+            destination_column < 0
+            or destination_column > 7
+            or destination_row < 0
+            or destination_row > 7
+        ):
             return False
 
         # player cannot capture their own piece
@@ -383,7 +402,7 @@ class AtomicChessGame:
         ):
             if row_distance > 1:
                 return False
-        
+
         return True
 
     def make_move(self, square_moved_from: str, square_moved_to: str) -> bool:
@@ -415,8 +434,16 @@ class AtomicChessGame:
         destination_row = 8 - int(destination_position[1])
 
         # validate coordinates are within board bounds
-        if (current_column < 0 or current_column > 7 or current_row < 0 or current_row > 7 or
-            destination_column < 0 or destination_column > 7 or destination_row < 0 or destination_row > 7):
+        if (
+            current_column < 0
+            or current_column > 7
+            or current_row < 0
+            or current_row > 7
+            or destination_column < 0
+            or destination_column > 7
+            or destination_row < 0
+            or destination_row > 7
+        ):
             return False
 
         piece = self.get_piece_type(current_row, current_column)
