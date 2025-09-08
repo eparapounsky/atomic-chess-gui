@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 # Constants representing chess pieces
 # Integers used to represent pieces for easier validation and movement logic
@@ -405,6 +406,93 @@ class AtomicChessGame:
 
         return True
 
+    def parse_square_notation(self, square: str) -> tuple[int, int]:
+        """
+        Converts algebraic notation (e.g., "e4") to board coordinates.
+        Parameters:
+            square (str): Square in algebraic notation
+        Returns:
+            tuple[int, int]: (row, column) coordinates (0-indexed)
+        """
+        column = ord(square[0]) - ord("a")
+        row = 8 - int(square[1])
+        return row, column
+
+    def are_coordinates_valid(self, row: int, column: int) -> bool:
+        """
+        Checks if the given coordinates are within board bounds.
+        Parameters:
+            row (int): Row coordinate (0-7)
+            column (int): Column coordinate (0-7)
+        Returns:
+            bool: True if coordinates are valid, False otherwise
+        """
+        return 0 <= row <= 7 and 0 <= column <= 7
+
+    def execute_atomic_explosion(self, explosion_row: int, explosion_column: int) -> None:
+        """
+        Executes an atomic explosion at the given coordinates, destroying all
+        non-pawn pieces in the 8 surrounding squares.
+        Parameters:
+            explosion_row (int): Row where explosion occurs
+            explosion_column (int): Column where explosion occurs
+        """
+        explosion_positions = [
+            (1, 0), (-1, 0), (0, 1), (0, -1),
+            (1, 1), (1, -1), (-1, 1), (-1, -1),
+        ]
+        
+        for row_offset, col_offset in explosion_positions:
+            target_row = explosion_row + row_offset
+            target_col = explosion_column + col_offset
+            
+            if self.are_coordinates_valid(target_row, target_col):
+                # Only destroy non-pawn pieces
+                if self._board[target_row][target_col] not in (BP, WP):
+                    self._board[target_row][target_col] = 0
+
+    def validate_move(self, piece: int, current_row: int, current_column: int, 
+                      destination_row: int, destination_column: int) -> bool:
+        """
+        Validates if a move is legal according to all game rules.
+        Parameters:
+            piece (int): The piece being moved
+            current_row (int): Current row of the piece
+            current_column (int): Current column of the piece
+            destination_row (int): Destination row
+            destination_column (int): Destination column
+        Returns:
+            bool: True if move is valid, False otherwise
+        """
+        # Check if coordinates are within bounds
+        if not (self.are_coordinates_valid(current_row, current_column) and 
+                self.are_coordinates_valid(destination_row, destination_column)):
+            return False
+
+        # Check if there's actually a piece to move
+        if piece == 0:
+            return False
+
+        # Check if it's the current player's piece
+        if not self.check_if_valid_player(piece):
+            return False
+
+        # Check atomic chess rules
+        if not self.check_if_valid_atomic_move(piece, destination_column, destination_row):
+            return False
+
+        # Check regular chess rules
+        if not self.check_if_valid_chess_move(
+            piece, current_column, current_row, destination_column, destination_row
+        ):
+            return False
+
+        # Check if game is still in progress
+        if self._game_state != "UNFINISHED":
+            return False
+
+        return True
+
     def make_move(self, square_moved_from: str, square_moved_to: str) -> bool:
         """
         Moves a piece from one square to another if the move is valid according to atomic chess rules.
@@ -417,93 +505,29 @@ class AtomicChessGame:
         Returns:
             bool: True if the move was valid and executed, False otherwise
         """
-
-        current_position = list(
-            square_moved_from
-        )  # splits string into a list of characters
-        destination_position = list(square_moved_to)
-
-        current_column = ord(current_position[0]) - ord(
-            "a"
-        )  # unicode conversion, a = 0
-        current_row = 8 - int(current_position[1])  # reverse order of rows
-
+        # parse square notations to coordinates
+        current_row, current_column = self.parse_square_notation(square_moved_from)
+        destination_row, destination_column = self.parse_square_notation(square_moved_to)
+        
         piece = self.get_piece_type(current_row, current_column)
 
-        destination_column = ord(destination_position[0]) - ord("a")
-        destination_row = 8 - int(destination_position[1])
-
-        # validate coordinates are within board bounds
-        if (
-            current_column < 0
-            or current_column > 7
-            or current_row < 0
-            or current_row > 7
-            or destination_column < 0
-            or destination_column > 7
-            or destination_row < 0
-            or destination_row > 7
-        ):
+        # validate the move
+        if not self.validate_move(piece, current_row, current_column, 
+                                 destination_row, destination_column):
             return False
 
-        piece = self.get_piece_type(current_row, current_column)
-
-        # check if there's actually a piece to move
-        if piece == 0:
-            return False
-
-        if self.check_if_valid_player(piece) is False:
-            return False
-
-        if (
-            self.check_if_valid_atomic_move(piece, destination_column, destination_row)
-            is False
-        ):
-            return False
-
-        if (
-            self.check_if_valid_chess_move(
-                piece, current_column, current_row, destination_column, destination_row
-            )
-            is False
-        ):
-            return False
-
-        if self._game_state != "UNFINISHED":
-            return False
-
-        # make indicated move
+        # execute the move
         self._board[current_row][current_column] = 0
+        
+        # handle capture with atomic explosion
         if self._board[destination_row][destination_column] != 0:
-            self._board[destination_row][
-                destination_column
-            ] = 0  # capturing piece explodes
-            positions = [
-                (1, 0),
-                (-1, 0),
-                (0, 1),
-                (0, -1),
-                (1, 1),
-                (1, -1),
-                (-1, 1),
-                (-1, -1),
-            ]
-            for row, column in positions:
-                try:
-                    if self._board[destination_row + row][
-                        destination_column + column
-                    ] not in (
-                        BP,
-                        WP,
-                    ):  # not a pawn
-                        self._board[destination_row + row][
-                            destination_column + column
-                        ] = 0
-                except IndexError:  # explosion on board edge
-                    continue
+            self._board[destination_row][destination_column] = 0  # Captured piece explodes
+            self.execute_atomic_explosion(destination_row, destination_column)
         else:
+            # Normal move without capture
             self._board[destination_row][destination_column] = piece
 
+        # update game state
         self.check_if_king_dead()
         self.update_current_player()
 
