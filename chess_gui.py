@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-from ChessVar import ChessVar
+from chess_logic import AtomicChessGame
 
 # Constants for styling
 WINDOW_SIZE = "800x1050"
@@ -23,7 +23,7 @@ class ChessGUI:
         self.root.geometry(WINDOW_SIZE)
         self.root.configure(bg=BG_COLOR)
 
-        self.game = ChessVar()
+        self.game = AtomicChessGame()
         self.selected_square: tuple[int, int] | None = None
         self.board_buttons: list[list[tk.Button]] = []
 
@@ -271,7 +271,7 @@ class ChessGUI:
 
     def new_game(self) -> None:
         """Start a new game."""
-        self.game = ChessVar()
+        self.game = AtomicChessGame()
         self.selected_square = None
         self.update_board()
         self.update_game_info()
