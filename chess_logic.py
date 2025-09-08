@@ -35,7 +35,7 @@ class Piece(Enum):
     WP = WP  # white pawn
 
 
-class ChessVar:
+class AtomicChessGame:
     """
     Represents a game of atomic chess.
     
